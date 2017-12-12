@@ -1,4 +1,4 @@
-package com.flow.flowlocationassignment;
+package Activities;
 
 import android.app.Activity;
 
