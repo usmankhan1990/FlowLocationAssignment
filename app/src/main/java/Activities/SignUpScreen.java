@@ -1,4 +1,4 @@
-package Activities;
+package activities;
 
 /**
  * Created by UsmanKhan on 12/12/17.
