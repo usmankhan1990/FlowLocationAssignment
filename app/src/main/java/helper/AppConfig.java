@@ -36,7 +36,7 @@ public class AppConfig {
         this.clientKey = clientKey;
     }
 
-    private  String applicationID = "07CbY3mfWUVz6bHvqnWLMmACUEEoam2IMtJQP7pV";
-    private  String clientKey = "L9EmKdiTTgAEEEEvIDgkuItmfB2kSd2rltRaCHOI";
+    private  String applicationID = "ESJQncoov78hVEBozxwulUB1AtGjzeABSlKPzXXO";
+    private  String clientKey = "vXnOgfC0loMMUPwakrWlQcQAx4DPE6dx6ZWNumtw";
 
 }

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
 import com.parse.ParseUser;
@@ -39,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         init();
 
         if(ParseUser.getCurrentUser()!=null){
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, TrackingLocationActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
@@ -83,7 +84,21 @@ public class LoginActivity extends AppCompatActivity {
     final View.OnClickListener btnSignInListener = new View.OnClickListener() {
         public void onClick(final View v) {
 
-            serviceCalls.loginCall(LoginActivity.this, email, password);
+            email = edtEmail.getText().toString();
+            password = edtPassword.getText().toString();
+
+            // Doing Validation for Sign Up
+
+            if (email.equalsIgnoreCase("") || password.equalsIgnoreCase("")) {
+
+                Toast.makeText(getApplicationContext(), "Kindly fill full information!", Toast.LENGTH_LONG).show();
+
+            } else {
+
+                // Doing Validation for Sign Up
+
+                serviceCalls.loginCall(LoginActivity.this, email, password);
+            }
 
         }
     };
@@ -94,8 +109,6 @@ public class LoginActivity extends AppCompatActivity {
 
     final View.OnClickListener txtSignUpListener = new View.OnClickListener() {
         public void onClick(final View v) {
-
-            serviceCalls.loginCall(LoginActivity.this, email, password);
 
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
