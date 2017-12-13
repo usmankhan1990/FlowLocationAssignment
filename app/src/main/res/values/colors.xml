@@ -3,4 +3,33 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_trans">#99FFFFFF</color>
+    <color name="red_theme">#C62828</color>
+    <color name="red_theme_new">#C62828</color>
+    <color name="white_intro">#FFFFFF</color>
+    <color name="gray">#716E74</color>
+    <color name="green">#06D22F</color>
+    <color name="black">#000</color>
+    <color name="blue">#002AFF</color>
+    <color name="dark_green">#46523C</color>
+    <color name="light_gray">#ececec</color>
+    <color name="blue_dark">#2d499d</color>
+    <color name="blue_light">#1e90ff</color>
+    <color name="light_blue">#2592F8</color>
+    <color name="red">#b20000</color>
+    <color name="darklight">#d5d2d3</color>
+    <color name="verylightgray">#ededed</color>
+    <color name="light_orange">#FFC828</color>
+    <color name="gray_blue">#183a46</color>
+    <color name="dark">#838080</color>
+    <color name="maroon">#6b0000</color>
+    <color name="app_theme_purple">#545454</color>
+    <color name="app_theme_purple_new">#545454</color>
+    <color name="yellow">#e8dc56</color>
+    <color name="gray_button">#545454</color>
+    <color name="new_green">#00994C</color>
+    <color name="selected_green">#5f9624</color>
+    <color name="gray_holo_light">#d0d0d0</color>
+    <item name="gray_holo_dark" type="color">#ff464646</item>
 </resources>
