@@ -41,7 +41,8 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 
-import Interfaces.DialogCallBack;
+import Interfaces.DialogConfirmCallBack;
+import Interfaces.DialogTitleDescriptionCallBack;
 import helper.Constants;
 import viewsHelper.UIView;
 
@@ -49,7 +50,7 @@ import viewsHelper.UIView;
 public class TrackingLocationActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener, DialogCallBack {
+        com.google.android.gms.location.LocationListener, DialogTitleDescriptionCallBack, DialogConfirmCallBack {
 
     Button btnDetails, btnTurnOn, btnTurnOff, btnPauseResume;
     SupportMapFragment supportMapFragment;
@@ -334,14 +335,8 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     final View.OnClickListener btnTurnOffListener = new View.OnClickListener() {
         public void onClick(final View v) {
 
-            btnTurnOn.setEnabled(true);
-            btnTurnOff.setEnabled(false);
-            btnPauseResume.setEnabled(false);
-            btnPauseResume.setText("Pause");
-
-            startLocationService = false;
-            pointsArraylistForLine.clear();
-            parseObjectTripHistory = null;
+            uiView.setTripStartOffDialogListener(TrackingLocationActivity.this);
+            uiView.confirmDialog(TrackingLocationActivity.this, "Do you want to finish trip", "Trip Off", false);
 
         }
     };
@@ -353,11 +348,8 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     final View.OnClickListener btnTurnOnListener = new View.OnClickListener() {
         public void onClick(final View v) {
 
-            pointsArraylistForLine.clear();
-            btnTurnOff.setEnabled(true);
-            btnPauseResume.setEnabled(true);
-            uiView.setiDialogListener(TrackingLocationActivity.this);
-            uiView.showDialogBox(TrackingLocationActivity.this);
+            uiView.setTripStartOffDialogListener(TrackingLocationActivity.this);
+            uiView.confirmDialog(TrackingLocationActivity.this, "Do you want to start trip", "Trip On", true);
 
         }
     };
@@ -382,11 +374,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
     }
 
-    @Override
-    public void sendCall(String description, String title) {
-        sendTrip(description, title);
-    }
-
     public void sendTrip(String description, String title)
 
     {
@@ -405,6 +392,9 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                     if(e == null){
                         btnTurnOn.setEnabled(false);
                         startLocationService = true;
+                        pointsArraylistForLine.clear();
+                        btnTurnOff.setEnabled(true);
+                        btnPauseResume.setEnabled(true);
                         parseObjectTripHistory.getObjectId();
                     }else{
                         Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
@@ -443,6 +433,27 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     }
 
 
+    @Override
+    public void sendDescriptionTitleTrip(String description, String title) {
+        sendTrip(description, title);
+    }
 
+    @Override
+    public void sendStartStopTrip(boolean startTrip) {
 
+        if(startTrip == true){
+            uiView.setiDialogTitleDescriptionListener(TrackingLocationActivity.this);
+            uiView.showTripTitleDescDialogBox(TrackingLocationActivity.this);
+        }else{
+            btnTurnOn.setEnabled(true);
+            btnTurnOff.setEnabled(false);
+            btnPauseResume.setEnabled(false);
+            btnPauseResume.setText("Pause");
+
+            startLocationService = false;
+            pointsArraylistForLine.clear();
+            parseObjectTripHistory = null;
+        }
+
+    }
 }

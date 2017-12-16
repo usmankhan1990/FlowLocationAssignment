@@ -6,18 +6,16 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.text.Editable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
 
-import Interfaces.DialogCallBack;
-import helper.AppConfig;
+import Interfaces.DialogConfirmCallBack;
+import Interfaces.DialogTitleDescriptionCallBack;
 
 /**
  * Created by Usman Khan on 13/12/2017.
@@ -28,7 +26,8 @@ public class UIView {
 
 
     private static UIView uiViewInstance;
-    DialogCallBack dialogCallBack = null;
+    DialogTitleDescriptionCallBack dialogTitleDescriptionCallBack = null;
+    DialogConfirmCallBack dialogConfirmCallBack = null;
     String title = "", description = "";
 
     public static UIView getInstance() {
@@ -38,8 +37,11 @@ public class UIView {
         return uiViewInstance;
     }
 
-    public void setiDialogListener(DialogCallBack dialogCallBack) {
-        this.dialogCallBack = dialogCallBack;
+    public void setiDialogTitleDescriptionListener(DialogTitleDescriptionCallBack dialogTitleDescriptionCallBack) {
+        this.dialogTitleDescriptionCallBack = dialogTitleDescriptionCallBack;
+    }
+    public void setTripStartOffDialogListener(DialogConfirmCallBack dialogConfirmCallBack) {
+        this.dialogConfirmCallBack = dialogConfirmCallBack;
     }
 
     public ProgressDialog showProgressBar(Context context) {
@@ -62,7 +64,7 @@ public class UIView {
         }
     }
 
-    public void showDialogBox(final Context context) {
+    public void showTripTitleDescDialogBox(final Context context) {
 
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.custom);
@@ -88,8 +90,8 @@ public class UIView {
                     Toast.makeText(context, "Please fill all fields",Toast.LENGTH_LONG).show();
                 }else{
 
-                    if(dialogCallBack!=null){
-                        dialogCallBack.sendCall(description,title);
+                    if(dialogTitleDescriptionCallBack !=null){
+                        dialogTitleDescriptionCallBack.sendDescriptionTitleTrip(description,title);
                         dialog.dismiss();
                     }
                     }
@@ -105,6 +107,39 @@ public class UIView {
         });
 
         dialog.show();
+    }
+
+    public void confirmDialog(Context context, String message, String title,final boolean startTrip){
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int choice) {
+                switch (choice) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if(dialogConfirmCallBack !=null){
+                            if(startTrip == true){
+                                dialogConfirmCallBack.sendStartStopTrip(true);
+                                dialog.dismiss();
+                            }else{
+                                dialogConfirmCallBack.sendStartStopTrip(false);
+                                dialog.dismiss();
+                            }
+
+                        }
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        if(dialogConfirmCallBack !=null){
+                            dialog.dismiss();
+                        }
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(message)
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
 
