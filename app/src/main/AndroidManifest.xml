@@ -43,6 +43,11 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
+        <!--<service-->
+            <!--android:name="services.LocationTrackingService"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="false"></service>-->
+
         <activity
             android:name="activities.SplashScreenActivity"
             android:theme="@style/AppTheme.NoActionBar">

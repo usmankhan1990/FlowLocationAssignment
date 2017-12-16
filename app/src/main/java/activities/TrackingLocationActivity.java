@@ -38,9 +38,7 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
-
 import java.util.ArrayList;
-
 import Interfaces.DialogConfirmCallBack;
 import Interfaces.DialogTitleDescriptionCallBack;
 import helper.Constants;
@@ -92,7 +90,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         super.onPause();
         if (mGoogleApiClient != null) {
 
-//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
         }
     }
@@ -117,12 +114,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
             buildGoogleApiClient();
             mGoogleMap.setMyLocationEnabled(true);
         }
-    }
-
-    private void checkGPS() {
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        mGPSStatus = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -201,7 +192,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
             }
 
             Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("User: " + currentUser + " "));
-//        marker.showInfoWindow();
             marker.showInfoWindow();
         } catch (Exception exp) {
             Log.e("Exception at track", exp.getMessage());
@@ -318,10 +308,18 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                 resumePause = true;
                 btnPauseResume.setText("Resume");
                 startLocationService = false;
+
+                // Start service when Resume button is pressed
+                /* startService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
             }else{
                 resumePause = false;
                 btnPauseResume.setText("Pause");
                 startLocationService = true;
+
+                // Stop service when Pause button is pressed
+                /* stopService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
             }
 
 
@@ -396,6 +394,9 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                         btnTurnOff.setEnabled(true);
                         btnPauseResume.setEnabled(true);
                         parseObjectTripHistory.getObjectId();
+
+                     /*   startService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
                     }else{
                         Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
                     }
@@ -453,7 +454,20 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
             startLocationService = false;
             pointsArraylistForLine.clear();
             parseObjectTripHistory = null;
+
+            // Stop service when switch is turned OFF
+            /* stopService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
         }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+            // On Application destroy, stop the service
+          /*  stopService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
 
     }
 }
