@@ -37,11 +37,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+
         init();
 
-        if(ParseUser.getCurrentUser()!=null){
+        if (ParseUser.getCurrentUser() != null) {
             Intent intent = new Intent(LoginActivity.this, TrackingLocationActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
             startActivity(intent);
         }
 
@@ -61,11 +62,11 @@ public class LoginActivity extends AppCompatActivity {
 
     void init() {
 
-        edtEmail    = findViewById(R.id.edtEmail);
+        edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
-        btnSignIn   = findViewById(R.id.btnSignIn);
-        toolbar     = findViewById(R.id.toolbar);
-        txtSignUp   = findViewById(R.id.txtSignUp);
+        btnSignIn = findViewById(R.id.btnSignIn);
+        toolbar = findViewById(R.id.toolbar);
+        txtSignUp = findViewById(R.id.txtSignUp);
 
         btnSignIn.setOnClickListener(btnSignInListener);
         txtSignUp.setOnClickListener(txtSignUpListener);
@@ -79,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * OnClickListener for Login button
+     * onClick success will send Login Call to server
      */
 
     final View.OnClickListener btnSignInListener = new View.OnClickListener() {
@@ -104,7 +106,8 @@ public class LoginActivity extends AppCompatActivity {
     };
 
     /**
-     * OnClickListener for SignUp TextVIew
+     * OnClickListener for Sign Up
+     * onClick success will send Sign Up Call to server
      */
 
     final View.OnClickListener txtSignUpListener = new View.OnClickListener() {

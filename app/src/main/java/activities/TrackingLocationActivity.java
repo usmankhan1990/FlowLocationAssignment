@@ -8,10 +8,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -21,6 +22,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import com.flow.flowlocationassignment.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -30,14 +34,24 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+
+import Interfaces.DialogCallBack;
+import helper.Constants;
+import viewsHelper.UIView;
+
 
 public class TrackingLocationActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener {
+        com.google.android.gms.location.LocationListener, DialogCallBack {
 
+    Button btnDetails, btnTurnOn, btnTurnOff, btnPauseResume;
     SupportMapFragment supportMapFragment;
     LocationRequest mLocationRequest;
     LocationManager mLocationManager;
@@ -46,19 +60,29 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     Location mLastLocation;
     Marker mCurrLocationMarker;
     GoogleMap mGoogleMap;
-    boolean mGPSStatus;
+    ProgressDialog pDialog;
+    boolean mGPSStatus, resumePause = false;
     public static final int PERMISSIONS_REQUEST_LOCATION = 2500;
-    private ArrayList<LatLng> points; //added
+    ParseObject parseObjectTripHistory;
+    ParseObject parseObjectTripLocations;
+    ParseGeoPoint parseGeoPoints;
+    private ArrayList<LatLng> pointsArraylistForLine; //added
     Polyline line; //added
+    private UIView uiView = UIView.getInstance();
+    private Constants constantsInstance = Constants.getInstance();
+    String currentUser = "";
+    private boolean startLocationService = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_tracking_screen);
-        mContext=getApplicationContext();
+        mContext = getApplicationContext();
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
-        points = new ArrayList<LatLng>();
+        pointsArraylistForLine = new ArrayList<LatLng>();
+
+        init();
 
     }
 
@@ -66,14 +90,15 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     public void onPause() {
         super.onPause();
         if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
         }
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
-        mGoogleMap=googleMap;
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -82,22 +107,20 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                     == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mGoogleMap.setMyLocationEnabled(true);
-            }
-            else {
+            } else {
                 checkPermission();  //Request Location Permission to user
 
 
             }
-        }
-        else {
+        } else {
             buildGoogleApiClient();
             mGoogleMap.setMyLocationEnabled(true);
         }
     }
 
     private void checkGPS() {
-        mLocationManager=(LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
-        mGPSStatus=mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        mGPSStatus = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
     }
 
@@ -109,7 +132,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                 .build();
         mGoogleApiClient.connect();
     }
-
 
 
     @Override
@@ -126,53 +148,76 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     }
 
     @Override
-    public void onConnectionSuspended(int i) {}
+    public void onConnectionSuspended(int i) {
+    }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {}
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
 
 
     @Override
-    public void onLocationChanged(Location location)
-    {
+    public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
 
-        //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+        try {
+            //Place current location marker
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Location");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+            mCurrLocationMarker.showInfoWindow();
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                .zoom(14)
-                .build();
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .zoom(14)
+                    .build();
 
-        if (mGoogleMap != null) {
-            mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            if (mGoogleMap != null) {
+                mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+
+
+            pointsArraylistForLine.add(latLng); //added
+            mGoogleMap.clear();
+
+            if(startLocationService == true && latLng!=null){
+
+                redrawLine();
+                parseGeoPoints = new ParseGeoPoint(latLng.latitude,latLng.longitude);
+                startTracking(parseObjectTripHistory,parseGeoPoints);
+                startLocationService = false;
+            }
+
+
+            if (constantsInstance.getpUser().getUsername() != null) {
+                currentUser = constantsInstance.getpUser().getUsername();
+            }
+
+            Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("User: " + currentUser + " "));
+//        marker.showInfoWindow();
+            marker.showInfoWindow();
+        } catch (Exception exp) {
+            Log.e("Exception at track", exp.getMessage());
         }
 
 
-
-        points.add(latLng); //added
-        redrawLine();
-
     }
 
-    private void redrawLine(){
+    private void redrawLine() {
 
         //Clear the map before making any Polyline
 
         mGoogleMap.clear();
 
         PolylineOptions options = new PolylineOptions().width(10).color(Color.BLUE).geodesic(true);
-        for (int i = 0; i < points.size(); i++) {
-            LatLng point = points.get(i);
+        for (int i = 0; i < pointsArraylistForLine.size(); i++) {
+            LatLng point = pointsArraylistForLine.get(i);
             options.add(point);
         }
 //        addMarker(); //add Marker in current position
@@ -194,7 +239,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
                                 ActivityCompat.requestPermissions(TrackingLocationActivity.this,
                                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                        PERMISSIONS_REQUEST_LOCATION );
+                                        PERMISSIONS_REQUEST_LOCATION);
 
                             }
                         })
@@ -204,7 +249,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSIONS_REQUEST_LOCATION );
+                        PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -225,9 +270,10 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
                             buildGoogleApiClient();
 
 
-
                         }
                         mGoogleMap.setMyLocationEnabled(true);
+
+
                     }
 
                 } else {
@@ -244,6 +290,155 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
             buildGoogleApiClient();
         }
         mGoogleMap.setMyLocationEnabled(true);
+
+    }
+
+    /**
+     * OnClickListener for Tracking Detail button
+     */
+
+    final View.OnClickListener btnDetailListener = new View.OnClickListener() {
+        public void onClick(final View v) {
+
+            Intent intent = new Intent(TrackingLocationActivity.this, TripsActivity.class);
+            startActivity(intent);
+
+        }
+    };
+
+    /**
+     * OnClickListener for Tracking PauseResume button
+     */
+
+    final View.OnClickListener btnPauseResumeListener = new View.OnClickListener() {
+        public void onClick(final View v) {
+
+            if(resumePause == false){
+                resumePause = true;
+                btnPauseResume.setText("Resume");
+                startLocationService = false;
+            }else{
+                resumePause = false;
+                btnPauseResume.setText("Pause");
+                startLocationService = true;
+            }
+
+
+        }
+    };
+
+    /**
+     * OnClickListener for Tracking TrackOff button
+     */
+
+    final View.OnClickListener btnTurnOffListener = new View.OnClickListener() {
+        public void onClick(final View v) {
+
+            btnTurnOn.setEnabled(true);
+            btnTurnOff.setEnabled(false);
+            btnPauseResume.setEnabled(false);
+            btnPauseResume.setText("Pause");
+
+            startLocationService = false;
+            pointsArraylistForLine.clear();
+            parseObjectTripHistory = null;
+
+        }
+    };
+
+    /**
+     * OnClickListener for Tracking TrackOn button
+     */
+
+    final View.OnClickListener btnTurnOnListener = new View.OnClickListener() {
+        public void onClick(final View v) {
+
+            pointsArraylistForLine.clear();
+            btnTurnOff.setEnabled(true);
+            btnPauseResume.setEnabled(true);
+            uiView.setiDialogListener(TrackingLocationActivity.this);
+            uiView.showDialogBox(TrackingLocationActivity.this);
+
+        }
+    };
+
+    void init() {
+        btnDetails = findViewById(R.id.btnDetails);
+        btnDetails.setOnClickListener(btnDetailListener);
+
+        btnTurnOn = findViewById(R.id.btnTurnOn);
+        btnTurnOn.setOnClickListener(btnTurnOnListener);
+
+        btnTurnOff = findViewById(R.id.btnTurnOff);
+        btnTurnOff.setOnClickListener(btnTurnOffListener);
+
+        btnPauseResume = findViewById(R.id.btnPauseResume);
+        btnPauseResume.setOnClickListener(btnPauseResumeListener);
+
+
+        btnTurnOn.setEnabled(true);
+        btnTurnOff.setEnabled(false);
+        btnPauseResume.setEnabled(false);
+
+    }
+
+    @Override
+    public void sendCall(String description, String title) {
+        sendTrip(description, title);
+    }
+
+    public void sendTrip(String description, String title)
+
+    {
+            parseObjectTripHistory = new ParseObject("Trips");
+        if(parseObjectTripHistory!=null){
+            pDialog = uiView.showProgressBar(this);
+            parseObjectTripHistory.put("description",description);
+            parseObjectTripHistory.put("tripName",title);
+            parseObjectTripHistory.put("user_id",constantsInstance.getpUser());
+            parseObjectTripHistory.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+
+                    pDialog.dismiss();
+
+                    if(e == null){
+                        btnTurnOn.setEnabled(false);
+                        startLocationService = true;
+                        parseObjectTripHistory.getObjectId();
+                    }else{
+                        Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+
+
+        }
+
+    }
+
+    public void startTracking(ParseObject parseObjectLocations, ParseGeoPoint pGeoPoint)
+
+    {
+        if(parseObjectTripHistory!=null && startLocationService == true){
+
+            parseObjectTripLocations = new ParseObject("TripHistory");
+            parseObjectTripLocations.put("trip_id",parseObjectLocations);
+            parseObjectTripLocations.put("latlong",pGeoPoint);
+            parseObjectTripLocations.put("user_id",constantsInstance.getpUser());
+            parseObjectTripLocations.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+
+                    if(e == null){
+                        startLocationService = true;
+                    }else{
+                        Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
 
     }
 

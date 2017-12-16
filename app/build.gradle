@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.flow.flowlocationassignment"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -25,10 +25,13 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.parse:parse-android:1.16.3'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'com.google.android.gms:play-services-maps:11.0.4'
     compile 'com.google.android.gms:play-services-location:11.0.4'
     compile 'com.google.android.gms:play-services-places:11.0.4'
+
+
 }
 
 

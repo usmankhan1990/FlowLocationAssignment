@@ -6,10 +6,20 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
+import com.google.android.gms.maps.model.LatLng;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.List;
 
 import viewsHelper.UIView;
 import activities.TrackingLocationActivity;
@@ -23,7 +33,10 @@ public class ServiceCalls {
 
     private static ServiceCalls serviceCallsInstance;
     ProgressDialog pDialog;
+
     private UIView uiView = UIView.getInstance();
+
+
 
     public static ServiceCalls getInstance() {
         if (serviceCallsInstance == null) {
@@ -82,9 +95,6 @@ public class ServiceCalls {
                 }
             }
         });
-
-
-
 
     }
 

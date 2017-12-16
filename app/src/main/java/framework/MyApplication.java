@@ -1,9 +1,7 @@
 package framework;
 
 import android.app.Application;
-
 import com.parse.Parse;
-
 import helper.AppConfig;
 import okhttp3.OkHttpClient;
 
@@ -32,7 +30,6 @@ public class MyApplication extends Application {
                 .clientBuilder(new OkHttpClient.Builder())
                 .build()
         );
-
     }
 
 }

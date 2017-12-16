@@ -8,7 +8,13 @@
 
 
 
-
+    <string name="home">Home</string>
+    <string name="menu">Menu</string>
+    <string name="cart">Shopping Cart</string>
+    <string name="orders">My Orders</string>
+    <string name="settings">Settings</string>
+    <string name="profile">My Profile</string>
+    <string name="my_profile">My Profile</string>
 
     <string name="title_activity_maps">Current Place Details</string>
     <string name="default_info_title">Default Location</string>
@@ -17,4 +23,12 @@
     <string name="pick_place">Choose a place</string>
 
     <string name="google_maps_key">AIzaSyApGJVAPD5z9pW60OepmbBgkV-0NPS9ewA</string>
+    <string name="track_off">Track Off</string>
+    <string name="track_on">Track On</string>
+    <string name="trips_history">Trips History</string>
+    <string name="the_floow_n_interview_assignment">The Floow \n Interview Assignment</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="title_for_trips">Title for trip</string>
+    <string name="description_for_trip">Description for trip</string>
 </resources>
