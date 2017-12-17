@@ -32,8 +32,6 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.ParseObject;
 
-import java.text.SimpleDateFormat;
-
 import helper.Constants;
 
 /**
@@ -54,10 +52,9 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
     Marker mCurrLocationMarker;
     GoogleMap mGoogleMap;
     TextView txtStartTime, txtEndTime, txtDistance, txtDiscription;
-    Polyline line; //added
-    SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss a");
+    Polyline lineOnMap;
     String currentUser = "";
-    LatLng pointLatLong;
+    LatLng allPointsLatLong;
     LatLng pointFirstLatLong;
     double distance = 0.0;
     CameraPosition cameraPosition;
@@ -165,7 +162,9 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
 
 
     /**
-     * <p>This function checks run time permission.</p>
+     * <p>This function will make a line on the map from start point to end point.
+     *    It took Location coordinates and displays it on the map.
+     * </p>
      */
 
     private void redrawLine() {
@@ -176,16 +175,16 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
 
         PolylineOptions options = new PolylineOptions().width(10).color(Color.RED).geodesic(true);
         for (int i = 0; i < constantsInstance.getLocationPoints().size(); i++) {
-            pointLatLong = constantsInstance.getLocationPoints().get(i);
+            allPointsLatLong = constantsInstance.getLocationPoints().get(i);
             pointFirstLatLong = constantsInstance.getLocationPoints().get(0);
-            options.add(pointLatLong);
+            options.add(allPointsLatLong);
         }
 
-        distance = constantsInstance.distance(pointFirstLatLong.latitude, pointFirstLatLong.longitude, pointLatLong.latitude, pointLatLong.longitude, 'K');
+        distance = constantsInstance.distance(pointFirstLatLong.latitude, pointFirstLatLong.longitude, allPointsLatLong.latitude, allPointsLatLong.longitude, 'K');
         txtDistance.setText(constantsInstance.decimalFormat.format(distance) + " km");
 
 
-        LatLng latLng = new LatLng(pointLatLong.latitude, pointLatLong.longitude);
+        LatLng latLng = new LatLng(allPointsLatLong.latitude, allPointsLatLong.longitude);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Location");
@@ -194,22 +193,15 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
         mCurrLocationMarker.showInfoWindow();
 
         cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(pointLatLong.latitude, pointLatLong.longitude))
+                .target(new LatLng(allPointsLatLong.latitude, allPointsLatLong.longitude))
                 .zoom(14)
                 .build();
 
-        //        addMarker(); //add Marker in current position
-
         if (mGoogleMap != null) {
-            cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(pointLatLong.latitude, pointLatLong.longitude))
-                    .zoom(12)
-                    .build();
-//            mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            cameraPosition = new CameraPosition.Builder().target(new LatLng(allPointsLatLong.latitude, allPointsLatLong.longitude)).zoom(12).build();
             mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            line = mGoogleMap.addPolyline(options); //add Polyline
-            Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(pointLatLong).title("Trip Ended Here"));
-//        marker.showInfoWindow();
+            lineOnMap = mGoogleMap.addPolyline(options); //add Polyline
+            Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(allPointsLatLong).title("Trip Ended Here"));
             marker.showInfoWindow();
         }
         getDates(constantsInstance.getpObjectTrackingDetail());
@@ -218,7 +210,9 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
     }
 
     /**
-     * <p>This function checks run time permission.</p>
+     * <p>This function checks run time permission.
+     * Checking Location Permission for accessing user location on map
+     * </p>
      */
 
     private void checkPermission() {
@@ -290,6 +284,12 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
 
     }
 
+
+    /**
+     * <p>This function get Date from server.
+     * Initializing views
+     * </p>
+     */
     void init() {
         txtStartTime = findViewById(R.id.txtStartTime);
         txtEndTime = findViewById(R.id.txtEndTime);
@@ -299,19 +299,22 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
 
 
     /**
-     * <p>This function get Date from server.</p>
-     *
-     * @param parseObjectDate - Parse Object from server to convert
+     * <p>This function get Date from server.
+     *    It is converting Date format by using SimpleDateFormat.
+     *    It is also converting Date format as per UTC time standard.
+     *    It is showing Start and End time with description.
+     * </p>
+     *@param parseObjectDate - Parse Object from server to convert
      */
 
     private void getDates(ParseObject parseObjectDate) {
 
         if (parseObjectDate.has("startTime")) {
 
-            txtStartTime.setText(dateFormatGmt.format(constantsInstance.getDateTimeUTC(parseObjectDate.getDate("startTime"))));
+            txtStartTime.setText(constantsInstance.dateFormatGmt.format(constantsInstance.getDateTimeUTC(parseObjectDate.getDate("startTime"))));
         }
         if (constantsInstance.getpObjectTrackingDetail().has("endTime")) {
-            txtEndTime.setText(dateFormatGmt.format(constantsInstance.getDateTimeUTC(parseObjectDate.getDate("endTime"))));
+            txtEndTime.setText(constantsInstance.dateFormatGmt.format(constantsInstance.getDateTimeUTC(parseObjectDate.getDate("endTime"))));
         }
         if (constantsInstance.getpObjectTrackingDetail().has("description")) {
             txtDiscription.setText(parseObjectDate.getString("description"));

@@ -37,12 +37,37 @@ public class UIView {
         return uiViewInstance;
     }
 
+    
+    /**
+     * <p>Setting instance of DialogTitleDescription interface
+     *    This function will use for sending call back to the desired View class.
+     *    It is will by StartEnd Trip Dialog box
+     * </p>
+     *@param dialogTitleDescriptionCallBack   - Making an instance of DialogTitleDescriptionCallBack.
+     */
     public void setiDialogTitleDescriptionListener(DialogTitleDescriptionCallBack dialogTitleDescriptionCallBack) {
         this.dialogTitleDescriptionCallBack = dialogTitleDescriptionCallBack;
     }
+
+
+    /**
+     * <p>Setting instance of DialogConfirmCallBack interface
+     *    This function will use for sending call back to the desired View class.
+     *    It is will by StartEnd Trip Dialog box
+     * </p>
+     *@param dialogConfirmCallBack   - Making an instance of DialogConfirmCallBack.
+     */
     public void setTripStartOffDialogListener(DialogConfirmCallBack dialogConfirmCallBack) {
         this.dialogConfirmCallBack = dialogConfirmCallBack;
     }
+
+
+
+    /**
+     * <p>This function initialize Progress Dialog for showing.
+     * </p>
+     *@param context   - Context from desired class.
+     */
 
     public ProgressDialog showProgressBar(Context context) {
         ProgressDialog progressDialog = new ProgressDialog(context);
@@ -56,13 +81,15 @@ public class UIView {
         Toast.makeText(context, "" + msg, Toast.LENGTH_SHORT).show();
     }
 
-    public void hideKeyboard(Activity context) {
-        View view = context.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
+
+    /**
+     * <p>This function gets title and description for Start Trip.
+     * Sends a callback to activity after taking title and description.
+     * Yes will send a call and start a trip.
+     * </p>
+     *@param context   - Context from desired class.
+     */
+
 
     public void showTripTitleDescDialogBox(final Context context) {
 
@@ -108,6 +135,20 @@ public class UIView {
 
         dialog.show();
     }
+
+    /**
+     * <p>This function shows confirm dialog for Start & Stop Trip.
+     *    Taking true value for start Trip confirmation.
+     *    Taking false value for stop Trip confirmation.
+     *    Negative Button will dismiss the Dialog box.
+     *    Sends a callback to activity after taking true, false value for Trip.
+     * </p>
+     *@param context   - Context from desired class.
+     *@param message   - Message to display here.
+     *@param title     - Title to display here.
+     *@param startTrip - Boolean for start(true) and start(false) for Trip off and Trip on.
+     */
+
 
     public void confirmDialog(Context context, String message, String title,final boolean startTrip){
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {

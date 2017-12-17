@@ -97,7 +97,7 @@ public class TripsActivity extends AppCompatActivity {
     {
 
         pQueryTracking.whereEqualTo("user_id", constants.getpUser());
-
+        pQueryTracking.orderByDescending("createdAt");
         pDialog = uiView.showProgressBar(this);
         pQueryTracking.findInBackground(new FindCallback<ParseObject>() {
             @Override
