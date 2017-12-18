@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
+import com.parse.LogOutCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import Interfaces.DialogConfirmCallBack;
 import Interfaces.DialogTitleDescriptionCallBack;
@@ -29,6 +32,7 @@ public class UIView {
     DialogTitleDescriptionCallBack dialogTitleDescriptionCallBack = null;
     DialogConfirmCallBack dialogConfirmCallBack = null;
     String title = "", description = "";
+    ProgressDialog pDialog;
 
     public static UIView getInstance() {
         if (uiViewInstance == null) {
@@ -184,6 +188,48 @@ public class UIView {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message)
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+
+    /**
+     * <p>This function shows confirm dialog for logout
+     * </p>
+     * @param context   - Context from desired class.
+     */
+
+
+    public void logOutDialog(final Context context) {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int choice) {
+                switch (choice) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        pDialog = showProgressBar(context);
+                        ParseUser.logOutInBackground(new LogOutCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                pDialog.dismiss();
+                                if(e==null){
+                                    ((Activity)(context)).finish();
+                                }
+                            }
+                        });
+
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        if (dialogConfirmCallBack != null) {
+                            dialog.dismiss();
+                        }
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Logout");
+        builder.setMessage("Do you want to logout?")
                 .setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }

@@ -31,7 +31,7 @@
         <Button
             android:id="@+id/btnTurnOn"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@color/white"
             android:text="@string/track_on"
@@ -39,7 +39,7 @@
         <Button
             android:id="@+id/btnTurnOff"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@color/white"
             android:text="@string/track_off"
@@ -47,7 +47,7 @@
         <Button
             android:id="@+id/btnPauseResume"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@color/white"
             android:text="@string/pause"
@@ -59,7 +59,7 @@
     <Button
         android:id="@+id/btnDetails"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="45dp"
         android:layout_weight="1"
         android:background="@color/white"
         android:text="@string/trips_history"
@@ -69,4 +69,16 @@
         />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/log_out"
+        />
 </RelativeLayout>

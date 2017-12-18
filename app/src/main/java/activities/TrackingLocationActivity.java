@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.LogOutCallback;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -63,7 +65,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         com.google.android.gms.location.LocationListener, DialogTitleDescriptionCallBack, DialogConfirmCallBack, TripsCallback
         , LocationSaveCallBack {
 
-    Button btnDetails, btnTurnOn, btnTurnOff, btnPauseResume;
+    Button btnDetails, btnTurnOn, btnTurnOff, btnPauseResume, btnLogout;
     SupportMapFragment supportMapFragment;
     LocationRequest mLocationRequest;
     Context mContext;
@@ -347,6 +349,19 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         }
     };
 
+    /**
+     * OnClickListener for Logout button
+     */
+
+    final View.OnClickListener btnLogOutListener = new View.OnClickListener() {
+        public void onClick(final View v) {
+
+            uiView.logOutDialog(TrackingLocationActivity.this);
+
+        }
+    };
+
+
 
     void init() {
         btnDetails = findViewById(R.id.btnDetails);
@@ -361,6 +376,8 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         btnPauseResume = findViewById(R.id.btnPauseResume);
         btnPauseResume.setOnClickListener(btnPauseResumeListener);
 
+        btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(btnLogOutListener);
 
         btnTurnOn.setEnabled(true);
         btnTurnOff.setEnabled(false);
