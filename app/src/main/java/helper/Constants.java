@@ -14,7 +14,10 @@ import java.util.TimeZone;
 
 /**
  * Created by UsmanKhan on 12/13/17.
+ * This class provides variables like Current User object, trackingObjectsList, Objects for getting Tracking Detail.
+ * It contains getter, setter values to use in whole project structure.
  */
+
 
 public class Constants {
 
@@ -26,6 +29,96 @@ public class Constants {
     ParseObject pObjectTrackingDetail;
     List<ParseObject> trackingObjectsList = new ArrayList();
     private ArrayList<LatLng> locationPoints; //added
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    String description = "", title = "";
+
+    public ArrayList<LatLng> getPointsArraylistForLine() {
+        return pointsArraylistForLine;
+    }
+
+    public void setPointsArraylistForLine(ArrayList<LatLng> pointsArraylistForLine) {
+        this.pointsArraylistForLine = pointsArraylistForLine;
+    }
+
+    private ArrayList<LatLng> pointsArraylistForLine = new ArrayList<LatLng>();
+
+    public boolean isIsbuttonOn() {
+        return isbuttonOn;
+    }
+
+    public void setIsbuttonOn(boolean isbuttonOn) {
+        this.isbuttonOn = isbuttonOn;
+    }
+
+    boolean isbuttonOn = true;
+
+    public boolean isIsbuttonOff() {
+        return isbuttonOff;
+    }
+
+    public void setIsbuttonOff(boolean isbuttonOff) {
+        this.isbuttonOff = isbuttonOff;
+    }
+
+    public boolean isIsbuttonPause() {
+        return isbuttonPause;
+    }
+
+    public void setIsbuttonPause(boolean isbuttonPause) {
+        this.isbuttonPause = isbuttonPause;
+    }
+
+    boolean isbuttonOff = true;
+    boolean isbuttonPause = true;
+
+
+    public boolean isStartLocationService() {
+        return startLocationService;
+    }
+
+    public void setStartLocationService(boolean startLocationService) {
+        this.startLocationService = startLocationService;
+    }
+
+    public boolean startLocationService = false;
+
+
+    public ParseObject getParseObjectTripLocations() {
+        return parseObjectTripLocations;
+    }
+
+    public void setParseObjectTripLocations(ParseObject parseObjectTripHistory) {
+        this.parseObjectTripLocations = parseObjectTripHistory;
+    }
+
+    ParseObject parseObjectTripLocations = new ParseObject("TripHistory");
+    ParseObject parseObjectTripHistory = new ParseObject("Trips");
+
+    public ParseObject getParseObjectTripHistory() {
+        return parseObjectTripHistory;
+    }
+
+    public void setParseObjectTripHistory(ParseObject parseObjectTripHistory) {
+        this.parseObjectTripHistory = parseObjectTripHistory;
+    }
+
+
 
     public static Constants getInstance() {
         if (instance == null) {

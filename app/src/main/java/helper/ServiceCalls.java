@@ -21,6 +21,8 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
 
+import Interfaces.DialogTitleDescriptionCallBack;
+import Interfaces.TripsCallback;
 import viewsHelper.UIView;
 import activities.TrackingLocationActivity;
 
@@ -35,8 +37,8 @@ public class ServiceCalls {
     ProgressDialog pDialog;
 
     private UIView uiView = UIView.getInstance();
-
-
+    private Constants constantsInstance = Constants.getInstance();
+    public ParseObject parseObjectTripHistory;
 
     public static ServiceCalls getInstance() {
         if (serviceCallsInstance == null) {
@@ -45,11 +47,32 @@ public class ServiceCalls {
         return serviceCallsInstance;
     }
 
+    TripsCallback tripsCallback = null;
+
+    /**
+     * <p>
+     * </p>
+     *@param tripsCallback   - Making an instance of TripsCallback.
+     */
+    public void setTripsCallback(TripsCallback tripsCallback) {
+        this.tripsCallback = tripsCallback;
+    }
+
+    /**
+     * <p>This method sends a request to server to make a user login.</p>
+     * In successful case it will send user object.
+     * In Unsuccessful case it will send an error with Null value for user.
+     *
+     * @param ctx - Context from Login screen
+     * @param email - Email for sending to server
+     * @param password - Password for sending to server
+     * @return user - It returns a user object
+     */
 
     public void loginCall(final Context ctx, String email, String password)
 
     {
-        pDialog =  uiView.showProgressBar(ctx);
+        pDialog = uiView.showProgressBar(ctx);
 
         ParseUser.logInInBackground(email, password, new LogInCallback() {
 
@@ -60,15 +83,26 @@ public class ServiceCalls {
                 if (user != null) {
                     Toast.makeText(ctx, R.string.login_success, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(ctx, TrackingLocationActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     ctx.startActivity(intent);
-                }else{
+                } else {
 
-                    Toast.makeText(ctx,"Please try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, "Please try again", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
+
+    /**
+     * <p>This method sends a request to server to make a user signup.</p>
+     * In successful case it will send user object.
+     * In Unsuccessful case it will send an error with Null value for user.
+     *
+     * @param ctx - Context from signup screen
+     * @param email - Email for sending to server
+     * @param password - Password for sending to server
+     * @return user - It returns a user object
+     */
 
     public void signUpCall(final Context ctx, String email, String password)
 
@@ -78,7 +112,7 @@ public class ServiceCalls {
         user.setUsername(email);
         user.setPassword(password);
         user.setEmail(email);
-        pDialog =  uiView.showProgressBar(ctx);
+        pDialog = uiView.showProgressBar(ctx);
 
 
         user.signUpInBackground(new SignUpCallback() {
@@ -87,7 +121,7 @@ public class ServiceCalls {
                 if (e == null) {
                     Toast.makeText(ctx, "Sign Up Successful", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(ctx, TrackingLocationActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     ctx.startActivity(intent);
 
                 } else {
@@ -97,5 +131,43 @@ public class ServiceCalls {
         });
 
     }
+
+
+    public void sendTrip(String description, String title,final Context ctx)
+
+    {
+        parseObjectTripHistory = new ParseObject("Trips");
+        if(parseObjectTripHistory!=null){
+            pDialog = uiView.showProgressBar(ctx);
+            parseObjectTripHistory.put("description",description);
+            parseObjectTripHistory.put("tripName",title);
+            parseObjectTripHistory.put("user_id",constantsInstance.getpUser());
+            parseObjectTripHistory.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+
+                    pDialog.dismiss();
+
+                    if(e == null){
+
+                        parseObjectTripHistory.getObjectId();
+                        if(tripsCallback !=null){
+                            tripsCallback.serverResponseForStartTrip(false,true,true, true);
+                        }
+
+                     /*   startService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+
+                    }else{
+                        Toast.makeText(ctx,"Please try again later...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+
+
+        }
+
+    }
+
 
 }

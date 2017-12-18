@@ -24,16 +24,8 @@ public class AppConfig {
         return applicationID;
     }
 
-    public void setApplicationID(String applicationID) {
-        this.applicationID = applicationID;
-    }
-
     public String getClientKey() {
         return clientKey;
-    }
-
-    public void setClientKey(String clientKey) {
-        this.clientKey = clientKey;
     }
 
     private  String applicationID = "ESJQncoov78hVEBozxwulUB1AtGjzeABSlKPzXXO";

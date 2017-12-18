@@ -19,7 +19,7 @@ import Interfaces.DialogTitleDescriptionCallBack;
 
 /**
  * Created by Usman Khan on 13/12/2017.
- * This class provides small View related modules like progress bar, hiding keyboard.
+ * This class provides View related modules like progress bar, custom Dialog boxes.
  */
 
 public class UIView {
@@ -37,7 +37,7 @@ public class UIView {
         return uiViewInstance;
     }
 
-    
+
     /**
      * <p>Setting instance of DialogTitleDescription interface
      *    This function will use for sending call back to the desired View class.
@@ -83,7 +83,7 @@ public class UIView {
 
 
     /**
-     * <p>This function gets title and description for Start Trip.
+     * <p>This function gets title and description for Start Trip to make a custom dialog box.
      * Sends a callback to activity after taking title and description.
      * Yes will send a call and start a trip.
      * </p>
@@ -121,6 +121,7 @@ public class UIView {
                         dialogTitleDescriptionCallBack.sendDescriptionTitleTrip(description,title);
                         dialog.dismiss();
                     }
+
                     }
 
 
@@ -137,7 +138,7 @@ public class UIView {
     }
 
     /**
-     * <p>This function shows confirm dialog for Start & Stop Trip.
+     * <p>This function shows confirm dialog for Start & Stop Trip to make a custom dialog box.
      *    Taking true value for start Trip confirmation.
      *    Taking false value for stop Trip confirmation.
      *    Negative Button will dismiss the Dialog box.

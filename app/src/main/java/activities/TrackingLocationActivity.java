@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -41,36 +40,36 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import Interfaces.DialogConfirmCallBack;
 import Interfaces.DialogTitleDescriptionCallBack;
+import Interfaces.TripsCallback;
 import helper.Constants;
+import helper.ServiceCalls;
 import viewsHelper.UIView;
 
 
 public class TrackingLocationActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener, DialogTitleDescriptionCallBack, DialogConfirmCallBack {
+        com.google.android.gms.location.LocationListener, DialogTitleDescriptionCallBack, DialogConfirmCallBack, TripsCallback {
 
     Button btnDetails, btnTurnOn, btnTurnOff, btnPauseResume;
     SupportMapFragment supportMapFragment;
     LocationRequest mLocationRequest;
-    LocationManager mLocationManager;
     Context mContext;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
     GoogleMap mGoogleMap;
     ProgressDialog pDialog;
-    boolean mGPSStatus, resumePause = false;
     public static final int PERMISSIONS_REQUEST_LOCATION = 2500;
-    ParseObject parseObjectTripHistory;
-    ParseObject parseObjectTripLocations;
+    ParseObject parseObjectTripHistory, parseObjectTripLocations;
     ParseGeoPoint parseGeoPoints;
-    private ArrayList<LatLng> pointsArraylistForLine; //added
-    Polyline line; //added
+    private ArrayList<LatLng> pointsArraylistForLine;
+    Polyline line;
     private UIView uiView = UIView.getInstance();
     private Constants constantsInstance = Constants.getInstance();
+    private ServiceCalls serviceCallsInstance = ServiceCalls.getInstance();
     String currentUser = "";
-    private boolean startLocationService = false;
+    private boolean startLocationService = false, resumePause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +181,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
                 redrawLine();
                 parseGeoPoints = new ParseGeoPoint(latLng.latitude,latLng.longitude);
-                startTracking(parseObjectTripHistory,parseGeoPoints);
+                savingLocationToServer(parseGeoPoints, startLocationService);
                 startLocationService = false;
             }
 
@@ -326,6 +325,30 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         }
     };
 
+
+
+    void init() {
+        btnDetails = findViewById(R.id.btnDetails);
+        btnDetails.setOnClickListener(btnDetailListener);
+
+        btnTurnOn = findViewById(R.id.btnTurnOn);
+        btnTurnOn.setOnClickListener(btnTurnOnListener);
+
+        btnTurnOff = findViewById(R.id.btnTurnOff);
+        btnTurnOff.setOnClickListener(btnTurnOffListener);
+
+        btnPauseResume = findViewById(R.id.btnPauseResume);
+        btnPauseResume.setOnClickListener(btnPauseResumeListener);
+
+
+        btnTurnOn.setEnabled(true);
+        btnTurnOff.setEnabled(false);
+        btnPauseResume.setEnabled(false);
+
+    }
+
+
+
     /**
      * OnClickListener for Tracking TrackOff button
      */
@@ -352,93 +375,6 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         }
     };
 
-    void init() {
-        btnDetails = findViewById(R.id.btnDetails);
-        btnDetails.setOnClickListener(btnDetailListener);
-
-        btnTurnOn = findViewById(R.id.btnTurnOn);
-        btnTurnOn.setOnClickListener(btnTurnOnListener);
-
-        btnTurnOff = findViewById(R.id.btnTurnOff);
-        btnTurnOff.setOnClickListener(btnTurnOffListener);
-
-        btnPauseResume = findViewById(R.id.btnPauseResume);
-        btnPauseResume.setOnClickListener(btnPauseResumeListener);
-
-
-        btnTurnOn.setEnabled(true);
-        btnTurnOff.setEnabled(false);
-        btnPauseResume.setEnabled(false);
-
-    }
-
-    public void sendTrip(String description, String title)
-
-    {
-            parseObjectTripHistory = new ParseObject("Trips");
-        if(parseObjectTripHistory!=null){
-            pDialog = uiView.showProgressBar(this);
-            parseObjectTripHistory.put("description",description);
-            parseObjectTripHistory.put("tripName",title);
-            parseObjectTripHistory.put("user_id",constantsInstance.getpUser());
-            parseObjectTripHistory.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-
-                    pDialog.dismiss();
-
-                    if(e == null){
-                        btnTurnOn.setEnabled(false);
-                        startLocationService = true;
-                        pointsArraylistForLine.clear();
-                        btnTurnOff.setEnabled(true);
-                        btnPauseResume.setEnabled(true);
-                        parseObjectTripHistory.getObjectId();
-
-                     /*   startService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
-
-                    }else{
-                        Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-
-
-
-        }
-
-    }
-
-    public void startTracking(ParseObject parseObjectLocations, ParseGeoPoint pGeoPoint)
-
-    {
-        if(parseObjectTripHistory!=null && startLocationService == true){
-
-            parseObjectTripLocations = new ParseObject("TripHistory");
-            parseObjectTripLocations.put("trip_id",parseObjectLocations);
-            parseObjectTripLocations.put("latlong",pGeoPoint);
-            parseObjectTripLocations.put("user_id",constantsInstance.getpUser());
-            parseObjectTripLocations.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-
-                    if(e == null){
-                        startLocationService = true;
-                    }else{
-                        Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-
-    }
-
-
-    @Override
-    public void sendDescriptionTitleTrip(String description, String title) {
-        sendTrip(description, title);
-    }
-
     @Override
     public void sendStartStopTrip(boolean startTrip) {
 
@@ -462,12 +398,67 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
     }
 
+
+    @Override
+    public void serverResponseForStartTrip(boolean isButtonOn, boolean isButtonOff, boolean isButtonPause, boolean startLocation) {
+        btnTurnOn.setEnabled(isButtonOn);
+        startLocationService = startLocation;
+        pointsArraylistForLine.clear();
+        btnTurnOff.setEnabled(isButtonOff);
+        btnPauseResume.setEnabled(isButtonPause);
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-            // On Application destroy, stop the service
-          /*  stopService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
 
+        // On Application destroy, stop the service
+          /*  stopService(new Intent(TrackingLocationActivity.this, LocationTrackingService.class)); */
+    }
+
+
+
+    @Override
+    public void sendDescriptionTitleTrip(String description, String title) {
+        sendTrip(description, title);
+    }
+
+    public void sendTrip(String description, String title)
+
+    {
+        serviceCallsInstance.setTripsCallback(TrackingLocationActivity.this);
+        serviceCallsInstance.sendTrip(description,title,TrackingLocationActivity.this);
+    }
+
+
+    public void savingLocationToServer(ParseGeoPoint pGeoPoint, boolean startLocation)
+
+    {
+        if(serviceCallsInstance.parseObjectTripHistory!=null && startLocation == true){
+
+            parseObjectTripLocations = new ParseObject("TripHistory");
+            parseObjectTripLocations.put("trip_id",serviceCallsInstance.parseObjectTripHistory);
+            parseObjectTripLocations.put("latlong",pGeoPoint);
+            parseObjectTripLocations.put("user_id",constantsInstance.getpUser());
+            parseObjectTripLocations.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+
+                    if(e == null){
+                        startLocationService = true;
+                    }else{
+                        Toast.makeText(TrackingLocationActivity.this,"Please try again later...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
 
     }
+
+
+
+
+
+
 }

@@ -13,14 +13,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
 import com.flow.flowlocationassignment.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import adapter.TrackingItemsAdapter;
 import helper.Constants;
 import viewsHelper.UIView;
@@ -32,16 +36,16 @@ import viewsHelper.UIView;
 public class TripsActivity extends AppCompatActivity {
 
 
-    ParseQuery pQueryTracking = new ParseQuery("Trips");
-    ParseQuery pQueryTrackingDetail = new ParseQuery("TripHistory");
+    ParseQuery pQueryTrips = new ParseQuery("Trips");
+    ParseQuery pQueryTripsDetail = new ParseQuery("TripHistory");
     RecyclerView rv_tracking_items;
     TrackingItemsAdapter tripsAdapter;
-    ProgressDialog pDialog;
+    ProgressDialog progressDialog;
     Toolbar toolbar;
     LinearLayoutManager layoutManager;
     private Constants constants = Constants.getInstance();
     private UIView uiView = UIView.getInstance();
-    private ArrayList<LatLng> points = new ArrayList<LatLng>(); //added
+    private ArrayList<LatLng> pointsGeoPoints = new ArrayList<LatLng>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,13 +75,15 @@ public class TripsActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
 
 
-                ParseObject parseObject = constants.getTrackingObjectsList().get(position);
+                ParseObject parseObjectTrackingDetail = constants.getTrackingObjectsList().get(position);
 
-                if (parseObject.has("tripName")) {
+                if (parseObjectTrackingDetail.has("tripName")) {
 
-                    // Setting ParseObject for extracting location details
-                    constants.setpObjectTrackingDetail(parseObject);
-                    getTrackingItemDetail();
+                    // Setting ParseObject for extracting location details in Constant Class.
+                    constants.setpObjectTrackingDetail(parseObjectTrackingDetail);
+
+                    // Calling method to extract Details of clicked trip.
+                    getTrackingItemDetail(parseObjectTrackingDetail);
 
                 } else {
 
@@ -89,21 +95,30 @@ public class TripsActivity extends AppCompatActivity {
         });
 
 
-        getTrackingItems();
+        getTrackingItems(constants.getpUser());
     }
 
-    public void getTrackingItems()
+
+    /**
+     * <p>This loads list of Tracking Trips.</p>
+     * Showing a data with Descending order as per Creating time.
+     * This method will also work to get the detail of particular trip by setting that particular trip object.
+     *
+     * @param parseUserCurrentObject - Current User object from constant class
+     */
+
+    public void getTrackingItems(ParseUser parseUserCurrentObject)
 
     {
 
-        pQueryTracking.whereEqualTo("user_id", constants.getpUser());
-        pQueryTracking.orderByDescending("createdAt");
-        pDialog = uiView.showProgressBar(this);
-        pQueryTracking.findInBackground(new FindCallback<ParseObject>() {
+        pQueryTrips.whereEqualTo("user_id", parseUserCurrentObject);
+        pQueryTrips.orderByDescending("createdAt");
+        progressDialog = uiView.showProgressBar(this);
+        pQueryTrips.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
 
-                pDialog.dismiss();
+                progressDialog.dismiss();
 
                 if (e == null) {
 
@@ -122,14 +137,21 @@ public class TripsActivity extends AppCompatActivity {
 
     }
 
-    public void getTrackingItemDetail()
+
+    /**
+     * <p>This will extract a detail of Particular Trip by passing Trip Object to it.</p>
+     * With successful response sets all location coordinates in Constant class for using it on Detail Map screen.
+     *
+     * @param parseObjectTrackingDetail - Particular Trip Object
+     */
+    public void getTrackingItemDetail(ParseObject parseObjectTrackingDetail)
 
     {
 
-        pQueryTrackingDetail.whereEqualTo("trip_id", constants.getpObjectTrackingDetail());
+        pQueryTripsDetail.whereEqualTo("trip_id", parseObjectTrackingDetail);
 
-        pDialog = uiView.showProgressBar(this);
-        pQueryTrackingDetail.findInBackground(new FindCallback<ParseObject>() {
+        progressDialog = uiView.showProgressBar(this);
+        pQueryTripsDetail.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
 
@@ -137,19 +159,19 @@ public class TripsActivity extends AppCompatActivity {
                 if (e == null && objects.size() > 0) {
                     for (ParseObject parseObjectLocations : objects) {
                         LatLng latLngPoints = new LatLng(parseObjectLocations.getParseGeoPoint("latlong").getLatitude(), parseObjectLocations.getParseGeoPoint("latlong").getLongitude());
-                        points.add(latLngPoints);
+                        pointsGeoPoints.add(latLngPoints);
                     }
 
 
-                    constants.setLocationPoints(points);
+                    constants.setLocationPoints(pointsGeoPoints);
 
-                    pDialog.dismiss();
+                    progressDialog.dismiss();
 
                     Intent intent = new Intent(TripsActivity.this, TrackingDetailScreen.class);
                     startActivity(intent);
 
-                }else{
-                    pDialog.dismiss();
+                } else {
+                    progressDialog.dismiss();
                     Toast.makeText(TripsActivity.this, "Please try again later", Toast.LENGTH_LONG).show();
                 }
 
@@ -161,6 +183,12 @@ public class TripsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * <p>This loads list of parse object to Adapter to fill Recycler View.</p>
+     * It is adding adapter with values.
+     *
+     * @param objects - List of Parse Objects for showing list
+     */
     public void loadData(List<ParseObject> objects) {
 
         tripsAdapter.addAll(objects);

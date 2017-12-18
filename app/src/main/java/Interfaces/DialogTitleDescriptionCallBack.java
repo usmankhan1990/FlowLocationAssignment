@@ -5,8 +5,5 @@ package Interfaces;
  */
 
 public interface DialogTitleDescriptionCallBack {
-
-
     void sendDescriptionTitleTrip(String description, String title);
-    
 }

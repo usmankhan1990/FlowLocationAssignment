@@ -16,7 +16,6 @@ public class SplashScreenActivity extends Activity {
 
 }
 
-
 ParseUser puser = ParseUser.getCurrentUser();
 
 	private void launchLandingScreen() {
@@ -24,7 +23,7 @@ ParseUser puser = ParseUser.getCurrentUser();
 			public void run() {
 
 				try {
-					sleep(1 * 3500); // splash should not be longer than 2 seconds
+					sleep(1 * 3500); // splash should not be longer than 3.5 seconds
 
 					if(puser != null) {
 						Intent intent = new Intent(SplashScreenActivity.this, TrackingLocationActivity.class);
