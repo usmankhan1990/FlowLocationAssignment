@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
 
-import helper.ServiceCalls;
+import Controller.ServiceCalls;
 
 /**
  * Created by UsmanKhan on 12/12/17.
@@ -67,6 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     /**
      * OnClickListener for SignUp button
+     * Sends sign Up call to server.
      */
 
     final View.OnClickListener btnSignUpListener = new View.OnClickListener() {
@@ -83,8 +84,6 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Kindly fill full information!", Toast.LENGTH_LONG).show();
 
             } else {
-
-            // Doing Validation for Sign Up
 
                 serviceCalls.signUpCall(SignUpActivity.this, email, password);
             }

@@ -40,10 +40,11 @@ public class UIView {
 
     /**
      * <p>Setting instance of DialogTitleDescription interface
-     *    This function will use for sending call back to the desired View class.
-     *    It is will by StartEnd Trip Dialog box
+     * This function will use for sending call back to the desired View class.
+     * It is will by StartEnd Trip Dialog box
      * </p>
-     *@param dialogTitleDescriptionCallBack   - Making an instance of DialogTitleDescriptionCallBack.
+     *
+     * @param dialogTitleDescriptionCallBack - Making an instance of DialogTitleDescriptionCallBack.
      */
     public void setiDialogTitleDescriptionListener(DialogTitleDescriptionCallBack dialogTitleDescriptionCallBack) {
         this.dialogTitleDescriptionCallBack = dialogTitleDescriptionCallBack;
@@ -52,21 +53,22 @@ public class UIView {
 
     /**
      * <p>Setting instance of DialogConfirmCallBack interface
-     *    This function will use for sending call back to the desired View class.
-     *    It is will by StartEnd Trip Dialog box
+     * This function will use for sending call back to the desired View class.
+     * It is will by StartEnd Trip Dialog box
      * </p>
-     *@param dialogConfirmCallBack   - Making an instance of DialogConfirmCallBack.
+     *
+     * @param dialogConfirmCallBack - Making an instance of DialogConfirmCallBack.
      */
     public void setTripStartOffDialogListener(DialogConfirmCallBack dialogConfirmCallBack) {
         this.dialogConfirmCallBack = dialogConfirmCallBack;
     }
 
 
-
     /**
      * <p>This function initialize Progress Dialog for showing.
      * </p>
-     *@param context   - Context from desired class.
+     *
+     * @param context - Context from desired class.
      */
 
     public ProgressDialog showProgressBar(Context context) {
@@ -87,7 +89,8 @@ public class UIView {
      * Sends a callback to activity after taking title and description.
      * Yes will send a call and start a trip.
      * </p>
-     *@param context   - Context from desired class.
+     *
+     * @param context - Context from desired class.
      */
 
 
@@ -99,30 +102,30 @@ public class UIView {
 
         // set the custom dialog components - textView, editFields and button
 
-        final EditText edtTitle       = dialog.findViewById(R.id.edtTitle);
+        final EditText edtTitle = dialog.findViewById(R.id.edtTitle);
         final EditText edtDescription = dialog.findViewById(R.id.edtDescription);
-              Button btnStartTrip     = dialog.findViewById(R.id.btnStartTrip);
-              Button btnCancel     = dialog.findViewById(R.id.btnCancel);
+        Button btnStartTrip = dialog.findViewById(R.id.btnStartTrip);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
 
         // if button is clicked, close the custom dialog
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                title       = edtTitle.getText().toString();
+                title = edtTitle.getText().toString();
                 description = edtDescription.getText().toString();
 
-                if(title.equalsIgnoreCase("")||description.equalsIgnoreCase("")){
+                if (title.equalsIgnoreCase("") || description.equalsIgnoreCase("")) {
 
-                    Toast.makeText(context, "Please fill all fields",Toast.LENGTH_LONG).show();
-                }else{
+                    Toast.makeText(context, "Please fill all fields", Toast.LENGTH_LONG).show();
+                } else {
 
-                    if(dialogTitleDescriptionCallBack !=null){
-                        dialogTitleDescriptionCallBack.sendDescriptionTitleTrip(description,title);
+                    if (dialogTitleDescriptionCallBack != null) {
+                        dialogTitleDescriptionCallBack.sendDescriptionTitleTrip(description, title);
                         dialog.dismiss();
                     }
 
-                    }
+                }
 
 
             }
@@ -130,7 +133,7 @@ public class UIView {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    dialog.dismiss();
+                dialog.dismiss();
             }
         });
 
@@ -139,29 +142,30 @@ public class UIView {
 
     /**
      * <p>This function shows confirm dialog for Start & Stop Trip to make a custom dialog box.
-     *    Taking true value for start Trip confirmation.
-     *    Taking false value for stop Trip confirmation.
-     *    Negative Button will dismiss the Dialog box.
-     *    Sends a callback to activity after taking true, false value for Trip.
+     * Taking true value for start Trip confirmation.
+     * Taking false value for stop Trip confirmation.
+     * Negative Button will dismiss the Dialog box.
+     * Sends a callback to activity after taking true, false value for Trip.
      * </p>
-     *@param context   - Context from desired class.
-     *@param message   - Message to display here.
-     *@param title     - Title to display here.
-     *@param startTrip - Boolean for start(true) and start(false) for Trip off and Trip on.
+     *
+     * @param context   - Context from desired class.
+     * @param message   - Message to display here.
+     * @param title     - Title to display here.
+     * @param startTrip - Boolean for start(true) and start(false) for Trip off and Trip on.
      */
 
 
-    public void confirmDialog(Context context, String message, String title,final boolean startTrip){
+    public void confirmDialog(Context context, String message, String title, final boolean startTrip) {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int choice) {
                 switch (choice) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        if(dialogConfirmCallBack !=null){
-                            if(startTrip == true){
+                        if (dialogConfirmCallBack != null) {
+                            if (startTrip == true) {
                                 dialogConfirmCallBack.sendStartStopTrip(true);
                                 dialog.dismiss();
-                            }else{
+                            } else {
                                 dialogConfirmCallBack.sendStartStopTrip(false);
                                 dialog.dismiss();
                             }
@@ -169,7 +173,7 @@ public class UIView {
                         }
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                        if(dialogConfirmCallBack !=null){
+                        if (dialogConfirmCallBack != null) {
                             dialog.dismiss();
                         }
                         break;

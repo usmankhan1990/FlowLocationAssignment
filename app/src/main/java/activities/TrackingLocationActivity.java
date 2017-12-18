@@ -10,7 +10,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,10 +34,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.SaveCallback;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
@@ -47,7 +45,7 @@ import Interfaces.DialogTitleDescriptionCallBack;
 import Interfaces.LocationSaveCallBack;
 import Interfaces.TripsCallback;
 import helper.Constants;
-import helper.ServiceCalls;
+import Controller.ServiceCalls;
 import viewsHelper.UIView;
 
 /**
@@ -73,14 +71,14 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
     Location mLastLocation;
     Marker mCurrLocationMarker;
     GoogleMap mGoogleMap;
-    ProgressDialog pDialog;
     public static final int PERMISSIONS_REQUEST_LOCATION = 2500;
-    ParseObject parseObjectTripHistory, parseObjectTripLocations;
+    ParseObject parseObjectTripHistory;
     ParseGeoPoint parseGeoPoints;
     private ArrayList<LatLng> pointsArraylistForLine;
     Polyline line;
     private UIView uiView = UIView.getInstance();
     private Constants constantsInstance = Constants.getInstance();
+    ParseUser pUser = ParseUser.getCurrentUser();
     private ServiceCalls serviceCallsInstance = ServiceCalls.getInstance();
     String currentUser = "";
     private boolean startLocationService = false, resumePause = false, turnOff = false;
@@ -93,7 +91,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
         pointsArraylistForLine = new ArrayList<LatLng>();
-
+        constantsInstance.setpUser(pUser);
         init();
 
     }
@@ -213,6 +211,11 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
 
     }
 
+    /**<p>
+     * This methods is used to redraw a line on a map.
+     * </p>
+     */
+
     private void redrawLine() {
 
         //Clear the map before making any Polyline
@@ -225,8 +228,13 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
             options.add(point);
         }
 
-        line = mGoogleMap.addPolyline(options); //add Polyline
+        line = mGoogleMap.addPolyline(options);
     }
+
+    /**<p>
+     * This methods checks runtime permission for allowing a user to use map functionality.
+     * </p>
+     */
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)

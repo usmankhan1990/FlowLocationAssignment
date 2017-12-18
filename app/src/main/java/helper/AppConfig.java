@@ -1,11 +1,8 @@
 package helper;
 
-import android.app.ProgressDialog;
-
-import viewsHelper.UIView;
-
 /**
  * Created by UsmanKhan on 12/12/17.
+ * This class is providing application and client key for parse to initialize server configurations.
  */
 
 public class AppConfig {

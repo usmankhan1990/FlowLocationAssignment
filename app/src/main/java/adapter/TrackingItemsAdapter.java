@@ -20,7 +20,9 @@ import helper.Constants;
 
 /**
  * Created by UsmanKhan on 12/14/17.
+ * This class is an adapter for Trips. It is using arraylist from a server to parse data as per requirement.
  */
+
 
 public class TrackingItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
@@ -110,6 +112,10 @@ public class TrackingItemsAdapter extends RecyclerView.Adapter<RecyclerView.View
         return null;
     }
 
+
+    /**
+     * TripsViewHolder class for modelViewHolder pattern.
+     */
 
     static class TripsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
