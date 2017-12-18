@@ -22,12 +22,15 @@ import java.util.Currency;
 import java.util.List;
 
 import Interfaces.DialogTitleDescriptionCallBack;
+import Interfaces.LocationSaveCallBack;
 import Interfaces.TripsCallback;
 import viewsHelper.UIView;
 import activities.TrackingLocationActivity;
 
 /**
  * Created by UsmanKhan on 12/13/17.
+ * This service controller class provides methods to connect to server and to get return success/failure responses.
+ * It has login, signUp, TripStart and Trip history saving methods.
  */
 
 public class ServiceCalls {
@@ -38,7 +41,7 @@ public class ServiceCalls {
 
     private UIView uiView = UIView.getInstance();
     private Constants constantsInstance = Constants.getInstance();
-    public ParseObject parseObjectTripHistory;
+    public ParseObject parseObjectTripHistory, parseObjectTripLocations;
 
     public static ServiceCalls getInstance() {
         if (serviceCallsInstance == null) {
@@ -48,6 +51,7 @@ public class ServiceCalls {
     }
 
     TripsCallback tripsCallback = null;
+    LocationSaveCallBack locationSaveCallBack = null;
 
     /**
      * <p>
@@ -57,6 +61,16 @@ public class ServiceCalls {
     public void setTripsCallback(TripsCallback tripsCallback) {
         this.tripsCallback = tripsCallback;
     }
+
+    /**
+     * <p>
+     * </p>
+     *@param locationSaveCallBack   - Making an instance of TripsCallback.
+     */
+    public void setLocationSaveCallBack(LocationSaveCallBack locationSaveCallBack) {
+        this.locationSaveCallBack = locationSaveCallBack;
+    }
+
 
     /**
      * <p>This method sends a request to server to make a user login.</p>
@@ -133,6 +147,14 @@ public class ServiceCalls {
     }
 
 
+    /**
+     * <p>This method sends a decription and title of a trip.</p>
+     * Parse object of this function query will be used to save locations in server as well.
+     * @param ctx - Context
+     * @param description - Description of a trip for sending to server
+     * @param title - Title of a trip for sending to server
+     */
+
     public void sendTrip(String description, String title,final Context ctx)
 
     {
@@ -169,5 +191,43 @@ public class ServiceCalls {
 
     }
 
+
+    /**
+     * <p>This method sends a users location to the server for a track history.</p>
+     * This query is also using a ParseObject of parseObjectTripHistory for saving a data with this key. Its a pointer in another table of Parse webservice data base.
+     * @param ctx - Context
+     * @param pGeoPoint - Users coordinates information - Latitude & Longitude
+     * @param startLocation - Boolean value to start(true) or not to start(false)
+     */
+
+
+    public void savingLocationToServer(ParseGeoPoint pGeoPoint, boolean startLocation, final Context ctx)
+
+    {
+        if(parseObjectTripHistory!=null && startLocation == true){
+
+            parseObjectTripLocations = new ParseObject("TripHistory");
+            parseObjectTripLocations.put("trip_id",parseObjectTripHistory);
+            parseObjectTripLocations.put("latlong",pGeoPoint);
+            parseObjectTripLocations.put("user_id",constantsInstance.getpUser());
+            parseObjectTripLocations.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+
+                    if(e == null){
+//                        startLocationService = true;
+
+                        if(locationSaveCallBack !=null){
+                            locationSaveCallBack.serverResponseForLocationSaving(true);
+                        }
+
+                    }else{
+                        Toast.makeText(ctx,"Please try again later...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+
+    }
 
 }
