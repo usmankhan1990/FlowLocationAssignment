@@ -1,6 +1,7 @@
 # Live location monitoring
 - This application is a cloud based application which displays the user’s current location on a map which updates the map in real time as the user moves. 
-- You can Sign up with the new user or login with existing user. For testing purpose you can use this **Test account: User = m.usmankhanz@gmail.com, Password = qwerasdf**
+- You can Sign up with the new user or login with existing user. For testing purpose you can use test account.
+- **Test account:** User = m.usmankhanz@gmail.com, Password = qwerasdf
 - This application is using back4app web service apis for saving live data on cloud data base with the help of back4apis. With this Admin can see the list of trips, registered users and can consume it with any admin domain like Web portal or any other application.
 - With cloud base system you can easily see and monitor existing system.
 -	With the help pf “tracking on/off” UI switch, it record or do not record the user’s movements. It also display's a path over the map as the user moves, that represents the user’s movements that are currently being recorded.
