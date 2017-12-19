@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.flow.flowlocationassignment.R;
 import com.parse.ParseUser;
 
-import Controller.ServiceCalls;
+import ServiceController.ServiceCalls;
 
 /**
  * Created by UsmanKhan on 12/12/17.

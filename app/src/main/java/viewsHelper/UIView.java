@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -19,6 +20,8 @@ import com.parse.ParseUser;
 
 import Interfaces.DialogConfirmCallBack;
 import Interfaces.DialogTitleDescriptionCallBack;
+import activities.LoginActivity;
+import activities.TrackingLocationActivity;
 
 /**
  * Created by Usman Khan on 13/12/2017.
@@ -212,7 +215,9 @@ public class UIView {
                             public void done(ParseException e) {
                                 pDialog.dismiss();
                                 if(e==null){
+                                    Intent intent = new Intent(context, LoginActivity.class);
                                     ((Activity)(context)).finish();
+                                    context.startActivity(intent);
                                 }
                             }
                         });

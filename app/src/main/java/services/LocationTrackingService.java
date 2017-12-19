@@ -2,6 +2,8 @@ package services;
 
 /**
  * Created by UsmanKhan on 12/16/17.
+ * Same Background Location service can be use, but in current scenario I am not using it.
+ * This class also contains few commented code which can be use to save location on cloud server.
  */
 
 import android.app.Service;
@@ -28,40 +30,15 @@ public class LocationTrackingService extends Service implements
      * The desired interval for location updates. Inexact. Updates may be more or less frequent.
      */
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
-
-    /**
-     * The fastest rate for active location updates. Exact. Updates will never be more frequent
-     * than this value.
-     */
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
     protected final static String LOCATION_KEY = "location-key";
     protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
-    /**
-     * Tracks the status of the location updates request. Value changes when the user presses the
-     * Start Updates and Stop Updates buttons.
-     */
     public static Boolean mRequestingLocationUpdates;
-    /**
-     * Time when the location was updated represented as a String.
-     */
     protected String mLastUpdateTime;
-    /**
-     * Provides the entry point to Google Play services.
-     */
     protected GoogleApiClient mGoogleApiClient;
-
-    /**
-     * Stores parameters for requests to the FusedLocationProviderApi.
-     */
     protected LocationRequest mLocationRequest;
-
-    /**
-     * Represents a geographical location.
-     */
     protected Location mCurrentLocation;
     public static boolean isEnded = false;
 
@@ -109,7 +86,14 @@ public class LocationTrackingService extends Service implements
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
-        Toast.makeText(this, "Location Updated", Toast.LENGTH_SHORT).show();
+        // To save location on server same code can be use which is currently being used by TrackingLocationActivity with few small changes
+    /*    if (startLocationService == true && latLng != null && turnOff == true) {
+
+            parseGeoPoints = new ParseGeoPoint(latLng.latitude, latLng.longitude);
+            savingLocationToServer(parseGeoPoints, startLocationService);
+            startLocationService = false;
+        }
+     */
     }
 
     @Override
@@ -163,17 +147,8 @@ public class LocationTrackingService extends Service implements
     protected void createLocationRequest() {
         mGoogleApiClient.connect();
         mLocationRequest = new LocationRequest();
-
-        // Sets the desired interval for active location updates. This interval is
-        // inexact. You may not receive updates at all if no location sources are available, or
-        // you may receive them slower than requested. You may also receive updates faster than
-        // requested if other applications are requesting location at a faster interval.
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-
-        // Sets the fastest rate for active location updates. This interval is exact, and your
-        // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -183,9 +158,6 @@ public class LocationTrackingService extends Service implements
     protected void startLocationUpdates() {
         if (!mRequestingLocationUpdates) {
             mRequestingLocationUpdates = true;
-
-            // The final argument to {@code requestLocationUpdates()} is a LocationListener
-            // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             Log.i(TAG, " startLocationUpdates===");
             isEnded = true;
@@ -198,13 +170,6 @@ public class LocationTrackingService extends Service implements
     protected void stopLocationUpdates() {
         if (mRequestingLocationUpdates) {
             mRequestingLocationUpdates = false;
-            // It is a good practice to remove location requests when the activity is in a paused or
-            // stopped state. Doing so helps battery performance and is especially
-            // recommended in applications that request frequent location updates.
-
-            Log.d(TAG, "stopLocationUpdates();==");
-            // The final argument to {@code requestLocationUpdates()} is a LocationListener
-            // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
     }
@@ -215,5 +180,23 @@ public class LocationTrackingService extends Service implements
         stopLocationUpdates();
     }
 
+   /*
+   Both methods can also be used as a Callback for this background location service saving on server.
+
+    public void savingLocationToServer(ParseGeoPoint pGeoPoint, boolean startLocation)
+
+    {
+        serviceCallsInstance.setLocationSaveCallBack(TrackingLocationActivity.this);
+        serviceCallsInstance.savingLocationToServer(pGeoPoint, startLocation, TrackingLocationActivity.this);
+
+    }
+
+    @Override
+    public void serverResponseForLocationSaving(boolean startLocation) {
+
+        startLocationService = startLocation;
+
+    }
+    */
 
 }

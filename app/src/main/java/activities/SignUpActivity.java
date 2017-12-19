@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.flow.flowlocationassignment.R;
 
-import Controller.ServiceCalls;
+import ServiceController.ServiceCalls;
 
 /**
  * Created by UsmanKhan on 12/12/17.

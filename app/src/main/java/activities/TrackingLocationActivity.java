@@ -34,8 +34,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.parse.LogOutCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -47,7 +45,7 @@ import Interfaces.DialogTitleDescriptionCallBack;
 import Interfaces.LocationSaveCallBack;
 import Interfaces.TripsCallback;
 import helper.Constants;
-import Controller.ServiceCalls;
+import ServiceController.ServiceCalls;
 import viewsHelper.UIView;
 
 /**

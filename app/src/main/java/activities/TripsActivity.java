@@ -21,7 +21,7 @@ import java.util.List;
 import Interfaces.TripsListCallback;
 import adapter.TrackingItemsAdapter;
 import helper.Constants;
-import Controller.ServiceCalls;
+import ServiceController.ServiceCalls;
 import viewsHelper.UIView;
 
 /**
