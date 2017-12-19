@@ -16,11 +16,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         tools:replace="android:allowBackup,icon,theme,label"
+        android:screenOrientation="portrait"
         android:theme="@style/AppTheme">
 
-        <activity android:name="activities.TrackingLocationActivity">
+        <activity
+            android:name="activities.TrackingLocationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
 
-        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -34,13 +37,16 @@
         <activity
             android:name="activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             >
 
         </activity>
 
         <activity
             android:name="activities.SignUpActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <!--<service-->
@@ -50,7 +56,8 @@
 
         <activity
             android:name="activities.SplashScreenActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,13 +67,15 @@
 
         <activity
             android:name="activities.TrackingDetailScreen"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
 
         <activity
         android:name="activities.TripsActivity"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar"
+        android:screenOrientation="portrait">
     </activity>
 
 
