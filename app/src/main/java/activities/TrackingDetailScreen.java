@@ -325,7 +325,9 @@ public class TrackingDetailScreen extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onBackPressed() {
-        constantsInstance.getLocationPoints().clear();
+        if(constantsInstance!=null){
+            constantsInstance.getLocationPoints().clear();
+        }
         super.onBackPressed();
     }
 }

@@ -44,6 +44,7 @@ public class ServiceCalls {
     private ArrayList<LatLng> pointsGeoPoints = new ArrayList<LatLng>();
     ParseQuery pQueryTripsDetail = new ParseQuery("TripHistory");
     ProgressDialog progressDialog;
+
     public static ServiceCalls getInstance() {
         if (serviceCallsInstance == null) {
             serviceCallsInstance = new ServiceCalls();

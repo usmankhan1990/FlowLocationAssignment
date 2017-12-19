@@ -92,7 +92,7 @@ public class TrackingLocationActivity extends AppCompatActivity implements OnMap
         mContext = getApplicationContext();
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
-        pointsArraylistForLine = new ArrayList<LatLng>();
+        pointsArraylistForLine = new ArrayList<>();
         constantsInstance.setpUser(pUser);
         init();
 
