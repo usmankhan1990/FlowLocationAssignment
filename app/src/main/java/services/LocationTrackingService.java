@@ -181,16 +181,12 @@ public class LocationTrackingService extends Service implements
     }
 
    /*
-   Both methods can also be used as a Callback for this background location service saving on server.
-
+    Both methods can also be used as a Callback for this background location service saving on server.
     public void savingLocationToServer(ParseGeoPoint pGeoPoint, boolean startLocation)
-
     {
         serviceCallsInstance.setLocationSaveCallBack(TrackingLocationActivity.this);
         serviceCallsInstance.savingLocationToServer(pGeoPoint, startLocation, TrackingLocationActivity.this);
-
     }
-
     @Override
     public void serverResponseForLocationSaving(boolean startLocation) {
 
